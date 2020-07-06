@@ -1,0 +1,20 @@
+{
+    "name": "wings/data_structures",
+    "authors": [
+        {
+            "name": "wings",
+            "email": "eternity.mr8@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "require": {}
+}

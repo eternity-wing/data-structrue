@@ -1,7 +1,10 @@
 <?php
 
+namespace App\Lib\BST;
+
 /**
- * Class Node
+ * Class Node.
+ * @author Wings<Eternity.mr8@gmail.com>
  */
 class Node
 {
@@ -44,6 +47,34 @@ class Node
         }
 
         return null;
+    }
+
+    public function isLeaf(): bool{
+       return !$this->hasChild();
+    }
+    public function hasChild(): bool{
+        return $this->getRight() !== null || $this->getRight() !== null;
+    }
+
+    public function __destruct()
+    {
+        if($this->left){
+            $this->left->parent = null;
+        }
+
+        if($this->right){
+            $this->right->parent = null;
+        }
+
+        if(null === $this->parent){
+            return;
+        }
+        if($this->parent->getRight() === $this){
+            $this->parent->setRight(null);
+        }
+        if($this->parent->getLeft() === $this){
+            $this->parent->setLeft(null);
+        }
     }
 
     /**
