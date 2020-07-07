@@ -3,49 +3,53 @@
 namespace App\Lib\BST;
 
 /**
- * Class BSTArray
- * @package App\Lib\BST
+ * Class BSTArray.
+ *
  * @author Wings<Eternity.mr8@gmail.com>
  */
 class BSTArray
 {
+
     /**
      * @var array
      */
     private $items = [];
+
     /**
-     * @var int
+     * @var integer
      */
     private $size = 0;
 
-    public function __construct()
+
+    public static function getRightChildIndex(int $index): int
     {
+        return (($index * 2) + 2);
     }
 
 
-
-    public static function getRightChildIndex(int $index): int{
-        return ($index * 2) + 2;
-    }
-    public static function getLeftChildIndex(int $index): int{
-        return ($index * 2) + 1;
+    public static function getLeftChildIndex(int $index): int
+    {
+        return (($index * 2) + 1);
     }
 
-    public function insert(int $value): void{
-        if(0 === $this->size){
+
+    public function insert(int $value): void
+    {
+        if (0 === $this->size) {
             $this->items[0] = $value;
             $this->size++;
             return;
         }
+
         $traversedItemIndex = 0;
-        while (true){
+        while (true) {
             $traversedItemValue = $this->items[$traversedItemIndex];
-            if($traversedItemValue === $value){
+            if ($traversedItemValue === $value) {
                 return;
             }
 
             $isLessThanTraversedItem = $traversedItemValue > $value;
-            $traversedItemLeftChildIndex =  self::getLeftChildIndex($traversedItemIndex);
+            $traversedItemLeftChildIndex = self::getLeftChildIndex($traversedItemIndex);
             $traversedItemLeftChild = $this->items[$traversedItemLeftChildIndex] ?? null;
 
             if ($isLessThanTraversedItem && $traversedItemLeftChild === null) {
@@ -54,7 +58,7 @@ class BSTArray
                 return;
             }
 
-            if($isLessThanTraversedItem) {
+            if ($isLessThanTraversedItem) {
                 $traversedItemIndex = $traversedItemLeftChildIndex;
                 continue;
             }
@@ -69,7 +73,7 @@ class BSTArray
                 return;
             }
 
-            if($isGreaterThanTraversedItem) {
+            if ($isGreaterThanTraversedItem) {
                 $traversedItemIndex = $traversedItemRightChildIndex;
                 continue;
             }
@@ -77,65 +81,86 @@ class BSTArray
     }
 
 
-    public function find(int $value): int{
-        $itemIndex = 0;
-        while ($itemValue = $this->items[$itemIndex] ?? false){
-            if($itemValue === $value){
-                return $itemIndex;
-            }
-            $itemIndex = $itemValue > $value ? self::getLeftChildIndex($itemIndex) : self::getRightChildIndex($itemIndex);
-        }
-        return -1;
+    public function find(int $value): int
+    {
+        return $this->search($value, 0);
     }
-    public function delete(int $value): void{
+
+    public function search(int $value, int $itemIndex = 0): int
+    {
+        $itemValue = $this->items[$itemIndex] ?? false;
+        if (false === $itemValue) {
+            return -1;
+        }
+        if ($itemValue === $value) {
+            return $itemIndex;
+        }
+        $leftChildIndex = self::getLeftChildIndex($itemIndex);
+        $rightChildIndex = self::getRightChildIndex($itemIndex);
+        $nextItemIndex = $itemValue > $value ? $leftChildIndex : $rightChildIndex;
+
+        return $this->search($value, $nextItemIndex);
+    }
+
+    public function delete(int $value): void
+    {
         $itemIndex = $this->find($value);
 
-        if(-1 === $itemIndex){
+        if (-1 === $itemIndex) {
             return;
         }
+
         $itemLeftChildIndex = self::getLeftChildIndex($itemIndex);
         $itemLeftChild = $this->items[$itemLeftChildIndex] ?? null;
 
         $itemRightChildIndex = self::getRightChildIndex($itemIndex);
         $itemRightChild = $this->items[$itemRightChildIndex] ?? null;
 
-        if(empty($itemLeftChild) && empty($itemRightChild)){
+        if (empty($itemLeftChild) && empty($itemRightChild)) {
             unset($this->items[$itemIndex]);
             return;
         }
 
-        $replacedNodeIndex =  $this->findMinChildValue(null !== $itemRightChild ? $itemRightChildIndex : $itemLeftChildIndex);
+        $replacedNodeIndex = $this->findMinChildValue(null !== $itemRightChild ? $itemRightChildIndex : $itemLeftChildIndex);
 
         $this->items[$itemIndex] = $this->items[$replacedNodeIndex];
 
         $replacedNodeRightChildIndex = self::getRightChildIndex($replacedNodeIndex);
         $replacedNodeRightChild = $this->items[$replacedNodeRightChildIndex] ?? null;
 
-        if(null !== $replacedNodeRightChild){
+        if (null !== $replacedNodeRightChild) {
             $this->items[$replacedNodeIndex] = $this->items[$replacedNodeRightChild];
             unset($this->items[$replacedNodeRightChild]);
-        }else{
+        } else {
             unset($this->items[$replacedNodeIndex]);
         }
     }
 
-    private function findMinChildValue(int $itemIndex): int{
+
+    private function findMinChildValue(int $itemIndex): int
+    {
         $leftChildIndex = self::getLeftChildIndex($itemIndex);
-        if(isset($this->items[$leftChildIndex])){
+        if (isset($this->items[$leftChildIndex])) {
             return $this->findMinChildValue($leftChildIndex);
         }
+
         return $itemIndex;
     }
 
-    public function printTree(int $rootIndex = 0): void {
+
+    public function printTree(int $rootIndex = 0): void
+    {
         $item = $this->items[$rootIndex] ?? false;
-        if(false === $item){
+        if (false === $item) {
             return;
         }
+
         $this->printTree(self::getLeftChildIndex($rootIndex));
         echo $item . "\n";
         $this->printTree(self::getRightChildIndex($rootIndex));
     }
+
+
     /**
      * @return array
      */
@@ -144,12 +169,12 @@ class BSTArray
         return $this->items;
     }
 
+
     /**
-     * @return int
+     * @return integer
      */
     public function getSize(): int
     {
         return $this->size;
     }
-
 }

@@ -25,56 +25,64 @@ class Node
      */
     private $value;
 
-    public function __construct(int $value , ?Node $parent = null)
+    public function __construct(int $value, ?Node $parent = null)
     {
         $this->value = $value;
         $this->parent = $parent;
     }
 
-    public function getSibling(): ?Node{
+
+    public function __destruct()
+    {
+        $this->onRemove();
+    }
+
+    public function onRemove(): void
+    {
+        if ($this->left) {
+            $this->left->parent = null;
+        }
+
+        if ($this->right) {
+            $this->right->parent = null;
+        }
+
+        if (null === $this->parent) {
+            return;
+        }
+        if ($this->parent->getRight() === $this) {
+            $this->parent->setRight(null);
+        }
+        if ($this->parent->getLeft() === $this) {
+            $this->parent->setLeft(null);
+        }
+    }
+    public function getSibling(): ?Node
+    {
         $parentLeftChild = $this->parent ? $this->parent->getLeft() : null;
         $parentRightChild = $this->parent ? $this->parent->getRight() : null;
-        if(null === $parentLeftChild || null === $parentRightChild){
+        if (null === $parentLeftChild || null === $parentRightChild) {
             return null;
         }
 
-        if($parentLeftChild !== $this){
+        if ($parentLeftChild !== $this) {
             return $parentLeftChild;
         }
 
-        if($parentRightChild !== $this){
+        if ($parentRightChild !== $this) {
             return $parentRightChild;
         }
 
         return null;
     }
 
-    public function isLeaf(): bool{
-       return !$this->hasChild();
-    }
-    public function hasChild(): bool{
-        return $this->getRight() !== null || $this->getRight() !== null;
-    }
-
-    public function __destruct()
+    public function isLeaf(): bool
     {
-        if($this->left){
-            $this->left->parent = null;
-        }
-
-        if($this->right){
-            $this->right->parent = null;
-        }
-
-        if(null === $this->parent){
-            return;
-        }
-        if($this->parent->getRight() === $this){
-            $this->parent->setRight(null);
-        }
-        if($this->parent->getLeft() === $this){
-            $this->parent->setLeft(null);
-        }
+        return !$this->hasChild();
+    }
+    public function hasChild(): bool
+    {
+        return $this->getRight() !== null || $this->getLeft() !== null;
     }
 
     /**
@@ -140,5 +148,4 @@ class Node
     {
         $this->value = $value;
     }
-
 }

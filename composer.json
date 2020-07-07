@@ -16,5 +16,13 @@
             "App\\Tests\\": "tests/"
         }
     },
-    "require": {}
+    "scripts": {
+        "lint:php": [
+            "php-cs-fixer fix ./src",
+            "php-cs-fixer fix ./tests"
+        ]
+    },
+    "require": {},
+    "require-dev": {
+    }
 }
