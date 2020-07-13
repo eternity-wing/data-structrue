@@ -35,71 +35,42 @@ class BSTArray
 
     public function insert(int $value): void
     {
-        if (0 === $this->size) {
-            $this->items[0] = $value;
+        $recipientIndex = $this->getRecipientIndex($value, 0);
+        if(!isset($this->items[$recipientIndex])){
+            $this->items[$recipientIndex] = $value;
             $this->size++;
             return;
         }
 
-        $traversedItemIndex = 0;
-        while (true) {
-            $traversedItemValue = $this->items[$traversedItemIndex];
-            if ($traversedItemValue === $value) {
-                return;
-            }
-
-            $isLessThanTraversedItem = $traversedItemValue > $value;
-            $traversedItemLeftChildIndex = self::getLeftChildIndex($traversedItemIndex);
-            $traversedItemLeftChild = $this->items[$traversedItemLeftChildIndex] ?? null;
-
-            if ($isLessThanTraversedItem && $traversedItemLeftChild === null) {
-                $this->items[$traversedItemLeftChildIndex] = $value;
-                $this->size++;
-                return;
-            }
-
-            if ($isLessThanTraversedItem) {
-                $traversedItemIndex = $traversedItemLeftChildIndex;
-                continue;
-            }
-
-            $isGreaterThanTraversedItem = $traversedItemValue < $value;
-            $traversedItemRightChildIndex = self::getRightChildIndex($traversedItemIndex);
-            $traversedItemRightChild = $this->items[$traversedItemRightChildIndex] ?? null;
-
-            if ($isGreaterThanTraversedItem && $traversedItemRightChild === null) {
-                $this->items[$traversedItemRightChildIndex] = $value;
-                $this->size++;
-                return;
-            }
-
-            if ($isGreaterThanTraversedItem) {
-                $traversedItemIndex = $traversedItemRightChildIndex;
-                continue;
-            }
-        }
     }
 
-
-    public function find(int $value): int
+    public function find(int $value): ?int
     {
-        return $this->search($value, 0);
+        return $this->items[$this->getRecipientIndex($value, 0)] ?? null;
     }
 
-    public function search(int $value, int $itemIndex = 0): int
+    public function getRecipientIndex(int $score, int $currentIndex = 0): ?int
     {
-        $itemValue = $this->items[$itemIndex] ?? false;
-        if (false === $itemValue) {
-            return -1;
+        $currentValue = $this->items[$currentIndex] ?? null;
+        if ($currentValue === null || $score === $currentValue) {
+            return $currentIndex;
         }
-        if ($itemValue === $value) {
-            return $itemIndex;
-        }
-        $leftChildIndex = self::getLeftChildIndex($itemIndex);
-        $rightChildIndex = self::getRightChildIndex($itemIndex);
-        $nextItemIndex = $itemValue > $value ? $leftChildIndex : $rightChildIndex;
 
-        return $this->search($value, $nextItemIndex);
+        $leftChildIndex = self::getLeftChildIndex($currentIndex);
+        $rightChildIndex = self::getRightChildIndex($currentIndex);
+
+        $leftChild = $this->items[$leftChildIndex] ?? null;
+        $rightChild = $this->items[$rightChildIndex] ?? null;
+
+        $isLessThanCurrentValue = $currentValue > $score;
+        $canBeInsertedInLeft = $isLessThanCurrentValue && null === $leftChild;
+        $canBeInsertedInRight = !$isLessThanCurrentValue && null === $rightChild;
+
+        if ($canBeInsertedInLeft || $canBeInsertedInRight) {
+            return $canBeInsertedInLeft ? $leftChildIndex : $rightChildIndex;
+        }
+
+        return $this->getRecipientIndex($score, $isLessThanCurrentValue ? $leftChildIndex : $rightChildIndex);
     }
 
     public function delete(int $value): void
